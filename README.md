@@ -1,38 +1,11 @@
--- ✅ Allowed Users List
-local testUsers = {
-    "Test1", "test2", "test3", "test 4", "test 5",
-    "", "Mr_Incredible120", "Test8", "Test9", "Test10",
-    "Test11", "Test12", "Test13", "Test14", "Test15",
-    "testUser16", "testUser17", "testUser18", "testUser19", "testUser20",
-    "testUser21", "testUser22", "testUser23", "testUser24", "testUser25",
-    "testUser26", "testUser27", "testUser28", "testUser29", "testUser30",
-    "testUser31", "testUser32", "testUser33", "testUser34", "testUser35",
-    "testUser36"
-}
-
--- ✅ Services
+-- Services
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 local Debris = game:GetService("Debris")
-local LocalPlayer = Players.LocalPlayer
 
--- ✅ User Verification
-local isVerified = false
-for _, name in ipairs(testUsers) do
-    if name == LocalPlayer.Name then
-        isVerified = true
-        break
-    end
-end
-
-if not isVerified then
-    warn("Access denied: You are not an allowed user.")
-    return
-end
-
--- ✅ Wait overrides
+-- Override wait functions for maximum performance
 local function stableWait(...)
     RunService.Heartbeat:Wait()
     return nil
@@ -40,14 +13,17 @@ end
 
 hookfunction(wait, stableWait)
 hookfunction(task.wait, stableWait)
+
 hookfunction(delay, function(_, func)
     task.spawn(func)
     return nil
 end)
+
 hookfunction(spawn, function(func)
     task.spawn(func)
 end)
 
+-- Disable yield-based functions globally
 local function disableYieldFunctions()
     local funcsToOverride = {"wait", "delay", "spawn", "task.wait"}
     for _, funcName in ipairs(funcsToOverride) do
@@ -57,21 +33,24 @@ local function disableYieldFunctions()
         end)
     end
 end
+
 disableYieldFunctions()
 
--- ✅ Core Functions
-
+-- Anti-Exploit Mechanism
 local function antiExploit()
     local exploitedPlayers = {}
+
     Players.PlayerAdded:Connect(function(player)
         player.CharacterAdded:Connect(function(character)
             local humanoid = character:WaitForChild("Humanoid")
             local rootPart = character:WaitForChild("HumanoidRootPart")
             local lastPosition = rootPart.Position
             local speedThreshold = 1e5
+
             RunService.Heartbeat:Connect(function()
                 local currentPosition = rootPart.Position
                 local distance = (currentPosition - lastPosition).Magnitude
+
                 if distance > speedThreshold then
                     rootPart.CFrame = CFrame.new(lastPosition)
                     if not exploitedPlayers[player.UserId] then
@@ -79,12 +58,14 @@ local function antiExploit()
                         player:Kick("Speed hacking detected.")
                     end
                 end
+
                 lastPosition = currentPosition
             end)
         end)
     end)
 end
 
+-- Protect Remote Events and Functions
 local function protectRemoteFunctions()
     for _, remote in pairs(ReplicatedStorage:GetChildren()) do
         if remote:IsA("RemoteEvent") or remote:IsA("RemoteFunction") then
@@ -101,6 +82,7 @@ local function protectRemoteFunctions()
     end
 end
 
+-- Clear visual effects
 local function clearEffects(part)
     for _, fx in pairs(part:GetChildren()) do
         if fx:IsA("ParticleEmitter") or fx:IsA("Fire") or fx:IsA("Smoke") then
@@ -109,6 +91,7 @@ local function clearEffects(part)
     end
 end
 
+-- Obliterate character
 local function obliterateCharacter(char)
     if not char then return end
     for _, part in ipairs(char:GetDescendants()) do
@@ -124,6 +107,7 @@ local function obliterateCharacter(char)
     end
 end
 
+-- Kill and freeze target
 local function killAndFreeze(humanoid, char)
     if humanoid and humanoid.Health > 0 then
         humanoid:TakeDamage(math.huge)
@@ -133,6 +117,7 @@ local function killAndFreeze(humanoid, char)
     obliterateCharacter(char)
 end
 
+-- Handle Mega Power Claws
 local function handleMegaClaws()
     local player = Players.LocalPlayer
 
@@ -149,7 +134,7 @@ local function handleMegaClaws()
     local function detectAndAttack()
         task.spawn(function()
             while true do
-                for i = 1, 9000 do
+                for i = 1, 9000 do -- 9000x loop for ultra-frequency detection
                     task.spawn(function()
                         for _, targetPlayer in pairs(Players:GetPlayers()) do
                             if targetPlayer ~= player then
@@ -158,7 +143,7 @@ local function handleMegaClaws()
                                     local humanoid = character:FindFirstChildOfClass("Humanoid")
                                     if humanoid and humanoid.Health > 0 then
                                         local distance = (player.Character.HumanoidRootPart.Position - character.HumanoidRootPart.Position).Magnitude
-                                        if distance < 900000000 * 9 then
+                                        if distance < 900000000 * 9 then -- 9x detection range
                                             onAttack(character)
                                         end
                                     end
@@ -175,6 +160,23 @@ local function handleMegaClaws()
     detectAndAttack()
 end
 
+-- Prevent escape
+local function preventEscape(target)
+    local char = target.Character
+    if char and char:FindFirstChild("HumanoidRootPart") then
+        local rootPart = char:FindFirstChild("HumanoidRootPart")
+        while true do
+            RunService.Heartbeat:Wait()
+            if rootPart and rootPart.Parent then
+                rootPart.CFrame = rootPart.CFrame
+            else
+                break
+            end
+        end
+    end
+end
+
+-- Enhanced Exploit Detection
 local function enhancedExploitDetection()
     Players.PlayerAdded:Connect(function(player)
         player.CharacterAdded:Connect(function(character)
@@ -184,6 +186,7 @@ local function enhancedExploitDetection()
             local previousVelocity = humanoidRoot.AssemblyLinearVelocity
             local extremeSpeed = 999e999999999999999999999000000000000000000000000000000000000000000000000000000000000000000000000000000000000
             local teleportThreshold = 9e9900000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+
             RunService.Heartbeat:Connect(function()
                 if (humanoidRoot.Position - previousPosition).Magnitude > extremeSpeed or
                    (humanoidRoot.AssemblyLinearVelocity - previousVelocity).Magnitude > extremeSpeed then
@@ -203,6 +206,7 @@ local function enhancedExploitDetection()
     end)
 end
 
+-- Ultra Claws for Ultimate Destruction
 local function ultraClaws()
     local player = Players.LocalPlayer
     local clawDamage = 9999999999e99999999999990000000000000000000000000000
@@ -212,7 +216,8 @@ local function ultraClaws()
             local humanoid = target:FindFirstChildOfClass("Humanoid")
             if humanoid and humanoid.Health > 0 then
                 humanoid.Health = 0
-                for i = 1, 9000000000000 do
+
+                for i = 1, 9000000000000 do -- 900000000000000 stacked effects
                     task.spawn(function()
                         local force = Instance.new("BodyVelocity")
                         force.MaxForce = Vector3.new(1e150, 1e150, 1e150)
@@ -222,7 +227,7 @@ local function ultraClaws()
 
                         local explosion = Instance.new("Explosion")
                         explosion.Position = target.HumanoidRootPart.Position
-                        explosion.BlastRadius = 1900000000000000000 * 900000000
+                        explosion.BlastRadius = 1900000000000000000 * 900000000 -- 9000x radius for stacking effect
                         explosion.BlastPressure = 99e9000000000000000000000000000000000000000 * 9000000000
                         explosion.ExplosionType = Enum.ExplosionType.Craters
                         explosion.Parent = Workspace
@@ -252,7 +257,7 @@ local function ultraClaws()
                         local humanoid = character:FindFirstChildOfClass("Humanoid")
                         if humanoid and humanoid.Health > 0 then
                             local distance = (player.Character.HumanoidRootPart.Position - character.HumanoidRootPart.Position).Magnitude
-                            if distance < 9000000 * 900000 then
+                            if distance < 9000000 * 900000 then -- 90000x radius
                                 clawVaporize(character)
                             end
                         end
@@ -265,6 +270,7 @@ local function ultraClaws()
     vaporizeNearbyPlayers()
 end
 
+-- Infinite Power Scaling
 local function infinitePowerScaling()
     local player = Players.LocalPlayer
     local powerLevel = 99000000000000000000000
@@ -275,7 +281,7 @@ local function infinitePowerScaling()
         RunService.Heartbeat:Wait()
         powerLevel = math.min(powerLevel + powerIncrement, maxPower)
 
-        for i = 1, 90000000000000 do
+        for i = 1, 90000000000000 do -- simulate 90000000000000000000x power blasts
             for _, targetPlayer in pairs(Players:GetPlayers()) do
                 if targetPlayer ~= player then
                     local character = targetPlayer.Character
@@ -283,7 +289,7 @@ local function infinitePowerScaling()
                         local humanoid = character:FindFirstChildOfClass("Humanoid")
                         if humanoid and humanoid.Health > 0 then
                             local distance = (player.Character.HumanoidRootPart.Position - character.HumanoidRootPart.Position).Magnitude
-                            if distance < 1000000 * 900 then
+                            if distance < 1000000 * 900 then -- 900x radius
                                 task.spawn(function()
                                     humanoid:TakeDamage(powerLevel)
                                 end)
@@ -296,7 +302,7 @@ local function infinitePowerScaling()
     end
 end
 
--- ✅ Start Everything (Only for Verified Users)
+-- Main
 task.spawn(function()
     antiExploit()
     protectRemoteFunctions()
